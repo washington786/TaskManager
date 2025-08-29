@@ -9,7 +9,7 @@ using TaskManager.Models;
 
 namespace TaskManager.Utils;
 
-public class Helper(IConfiguration configuration, IServiceCollection services)
+public class Helper(IServiceCollection services, IConfiguration configuration)
 {
     private readonly IConfiguration _config = configuration;
     private readonly IServiceCollection _service = services;
@@ -72,6 +72,15 @@ public class Helper(IConfiguration configuration, IServiceCollection services)
                 ValidAudience = jwt["Audience"],
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["JwtSecret"]!))
             };
+        });
+    }
+
+    public void AddCors()
+    {
+        _service.AddCors(options =>
+        {
+            options.AddPolicy("dev", op => op.WithOrigins("https://localhost:3000").AllowAnyHeader().AllowAnyMethod());
+            options.AddPolicy("prod", op => op.WithOrigins("https://localhost:3000").AllowAnyHeader().AllowAnyMethod());
         });
     }
 }
