@@ -1,4 +1,3 @@
-using System;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +18,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         );
     }
 
-    public DbSet<Task> Tasks { get; set; }
+    public DbSet<TaskItem> Tasks { get; set; }
 
     public DbSet<AppUser> User { get; set; }
 }

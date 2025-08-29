@@ -7,11 +7,13 @@ builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 
 var connections = new Helper(builder.Services, builder.Configuration);
+
+connections.SwaggerConfig();
+
 connections.DbConnectionCtx();
 connections.IdentityAdding();
 connections.AddCors();
 connections.AddAuthentication();
-connections.SwaggerConfig();
 
 var app = builder.Build();
 

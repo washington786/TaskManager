@@ -18,7 +18,7 @@ public class Helper(IServiceCollection services, IConfiguration configuration)
     {
         _service.AddSwaggerGen((options) =>
         {
-            options.SwaggerDoc("V1", new OpenApiInfo { Title = "Task API", Version = "V1" });
+            options.SwaggerDoc("v1", new OpenApiInfo { Title = "Task API", Version = "v1" });
 
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
