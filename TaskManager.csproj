@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <Folder Include="Interfaces/" />
-    <Folder Include="Services/" />
     <Folder Include="Utils/" />
   </ItemGroup>
 
