@@ -1,4 +1,4 @@
-# 🚀 TaskManager API
+# TaskManager API
 
 A simple, secure, and clean ASP.NET Web API for managing tasks with **JWT authentication**, **role-based authorization**, **ASP.NET Identity**, **Entity Framework Core**, and **Swagger UI**.
 
