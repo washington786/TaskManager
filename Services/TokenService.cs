@@ -27,7 +27,9 @@ public class TokenService(IConfiguration configuration)
         }
 
         var jwtSettings = _config.GetSection("Jwt");
-        var key = jwtSettings["JwtSecret"];
+        var key = jwtSettings["Key"];
+
+        Console.WriteLine(jwtSettings["Key"]);
         var signInKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key!));
 
         var credentials = new SigningCredentials(signInKey, SecurityAlgorithms.HmacSha256);

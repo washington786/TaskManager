@@ -10,15 +10,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-
-        builder.Entity<IdentityRole>().HasData(
-            new IdentityRole("Admin"),
-            new IdentityRole("User"),
-            new IdentityRole("TaskMaanager")
-        );
     }
 
     public DbSet<TaskItem> Tasks { get; set; }
-
-    public DbSet<AppUser> User { get; set; }
 }

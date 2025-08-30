@@ -15,7 +15,7 @@ namespace TaskManager.Controllers
         private readonly UserManager<AppUser> _userManager = userManager;
 
         [HttpPost("signUp")]
-        public async Task<ActionResult> Register([FromBody] RegisterDto payload)
+        public async Task<ActionResult> signUp([FromBody] RegisterDto payload)
         {
             if (!ModelState.IsValid)
             {
@@ -33,6 +33,7 @@ namespace TaskManager.Controllers
                 Email = payload.Email,
                 FirstName = payload.FirstName,
                 LastName = payload.LastName,
+                UserName = payload.Email
             };
 
             if (await _userManager.FindByEmailAsync(payload.Email) is not null)
@@ -41,6 +42,14 @@ namespace TaskManager.Controllers
             }
 
             var results = await _userManager.CreateAsync(user, payload.Password);
+
+            if (!results.Succeeded) return BadRequest(new { message = "Failed to create account" });
+
+            if (new[] { "User", "Admin", "TaskManager" }.Contains(roleName))
+            {
+                await _userManager.AddToRoleAsync(user, roleName);
+            }
+
             var roles = await _userManager.GetRolesAsync(user!);
             var token = _service.GenerateToken(user, roles);
 
@@ -49,13 +58,22 @@ namespace TaskManager.Controllers
                 return BadRequest(new { message = "Failed to create account", error = results.Errors.Select(e => e.Description) });
             }
 
-            var response = new Dictionary<string, string> { { "Token", token }, { "user", user.ToString() } };
-
-            return Ok(response);
+            return Ok(new
+            {
+                Token = token,
+                User = new
+                {
+                    user.Email,
+                    user.FirstName,
+                    user.LastName,
+                    user.Id
+                },
+                message = "Account Created successfully"
+            });
         }
 
         [HttpPost("signIn")]
-        public async Task<ActionResult> Login([FromBody] LoginDto payload)
+        public async Task<ActionResult> signIn([FromBody] LoginDto payload)
         {
             if (!ModelState.IsValid)
             {
@@ -63,9 +81,14 @@ namespace TaskManager.Controllers
             }
 
             var user = await _userManager.FindByEmailAsync(payload.Email);
-            var isMatch = await _userManager.CheckPasswordAsync(user!, payload.Password);
 
-            if (user is null || !isMatch)
+            if (user == null)
+            {
+                return Unauthorized(new { message = "Invalid Email or Password. Please try again." });
+            }
+
+            var isPasswordValid = await _userManager.CheckPasswordAsync(user!, payload.Password);
+            if (!isPasswordValid)
             {
                 return Unauthorized(new { message = "Invalid Email or Password. Please try again." });
             }
@@ -73,11 +96,22 @@ namespace TaskManager.Controllers
             var roles = await _userManager.GetRolesAsync(user);
             var token = _service.GenerateToken(user, roles);
 
-            return Ok(new { Token = token, message = "Successfully signed in." });
+            return Ok(new
+            {
+                Token = token,
+                message = "Successfully signed in.",
+                User = new
+                {
+                    user.Id,
+                    user.Email,
+                    user.FirstName,
+                    user.LastName
+                }
+            });
         }
 
-        [HttpPost("reset-password")]
-        public async Task<ActionResult> PasswordReset([FromBody] ResetDto payload)
+        [HttpPost("resetPassword")]
+        public async Task<ActionResult> resetPassword([FromBody] ResetDto payload)
         {
             if (!ModelState.IsValid)
             {
@@ -86,14 +120,14 @@ namespace TaskManager.Controllers
 
             var user = await _userManager.FindByEmailAsync(payload.Email);
 
-            if (user is null)
+            if (user == null)
             {
                 return BadRequest(new { message = "Sorry, Email account is not valid!" });
             }
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-            return Ok(token);
+            return Ok(new { message = "Token successfull sent" });
         }
     }
 }

@@ -25,7 +25,9 @@ public class Helper(IServiceCollection services, IConfiguration configuration)
                 In = ParameterLocation.Header,
                 Description = "Please enter bearer token {token}",
                 Name = "Authorization",
-                Type = SecuritySchemeType.ApiKey
+                Type = SecuritySchemeType.Http,
+                BearerFormat = "JWT",
+                Scheme = "Bearer"
             });
 
             options.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -57,6 +59,7 @@ public class Helper(IServiceCollection services, IConfiguration configuration)
     public void AddAuthentication()
     {
         var jwt = _config.GetSection("Jwt");
+        Console.WriteLine(jwt["Key"]);
         _service.AddAuthentication(op =>
         {
             op.DefaultChallengeScheme = "Bearer";
@@ -70,7 +73,7 @@ public class Helper(IServiceCollection services, IConfiguration configuration)
                 ValidateLifetime = true,
                 ValidIssuer = jwt["Issuer"],
                 ValidAudience = jwt["Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["JwtSecret"]!))
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Key"]!))
             };
         });
     }
